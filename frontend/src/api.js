@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://study-planner.onrender.com",
+  baseURL: "https://study-planner-az4r.onrender.com",
 });
 
 // 🔐 Attach token automatically to every request
