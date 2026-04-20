@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import API from "../api";
 import { useNavigate } from "react-router-dom";
 
 function Auth() {
@@ -14,32 +14,35 @@ function Auth() {
   const handleSubmit = async () => {
     try {
       if (isLogin) {
-        const res = await axios.post("http://127.0.0.1:8000/login", {
+        const res = await API.post("/login", {
           email,
           password,
         });
+
+        console.log("LOGIN SUCCESS:", res.data);
 
         localStorage.setItem("user", JSON.stringify(res.data.user));
         localStorage.setItem("token", res.data.access_token);
 
         navigate("/dashboard");
       } else {
-        await axios.post("http://127.0.0.1:8000/register", {
+        await API.post("/register", {
           username,
           email,
           password,
         });
 
+        alert("Registration successful! Please login.");
         setIsLogin(true);
       }
     } catch (err) {
+      console.log("AUTH ERROR:", err);
       alert(err.response?.data?.detail || "Something went wrong");
     }
   };
 
   return (
     <div style={styles.page}>
-
       <div style={styles.card}>
 
         <h2 style={styles.title}>
@@ -80,13 +83,15 @@ function Auth() {
 
         <p style={styles.toggleText}>
           {isLogin ? "New here?" : "Already have an account?"}{" "}
-          <span onClick={() => setIsLogin(!isLogin)} style={styles.link}>
+          <span
+            onClick={() => setIsLogin(!isLogin)}
+            style={styles.link}
+          >
             {isLogin ? "Create account" : "Login"}
           </span>
         </p>
 
       </div>
-
     </div>
   );
 }
