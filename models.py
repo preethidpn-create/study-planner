@@ -19,6 +19,8 @@ class Task(SQLModel, table=True):
     description: str
     due_date: date
     is_completed: bool = False
+
     subject_id: int
+    user_id: int   # 🔥 ADD THIS
     priority: str = "medium"
     difficulty: str = "easy"

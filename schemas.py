@@ -19,5 +19,6 @@ class TaskCreate(BaseModel):
     description: str
     due_date: date
     subject_id: int
+    user_id: int   # 🔥 ADD THIS
     priority: str = "medium"
     difficulty: str = "easy"
