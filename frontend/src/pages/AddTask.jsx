@@ -1,29 +1,56 @@
 import { useState } from "react";
 import API from "../api";
+import { useNavigate } from "react-router-dom";
 
 function AddTask() {
+  const navigate = useNavigate();
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [difficulty, setDifficulty] = useState("easy");
+  const [priority, setPriority] = useState("medium");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await API.post("/tasks", {
-      title,
-      description,
-      due_date: dueDate,
-      difficulty,
-      subject_id: 1,
-    });
+    try {
+      // 🔥 GET USER FROM LOCAL STORAGE
+      const user = JSON.parse(localStorage.getItem("user"));
 
-    alert("Task Added ✅");
+      if (!user) {
+        alert("User not logged in ❌");
+        return;
+      }
 
-    setTitle("");
-    setDescription("");
-    setDueDate("");
-    setDifficulty("easy");
+      console.log("USER:", user); // debug
+
+      await API.post("/tasks", {
+        title: title,
+        description: description,
+        due_date: dueDate,
+        subject_id: 1,
+        user_id: user.id,        // ✅ MAIN FIX
+        priority: priority,      // ✅ REQUIRED
+        difficulty: difficulty
+      });
+
+      alert("Task Added ✅");
+
+      // reset form
+      setTitle("");
+      setDescription("");
+      setDueDate("");
+      setDifficulty("easy");
+      setPriority("medium");
+
+      // 🔥 redirect to dashboard
+      navigate("/dashboard");
+
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.detail || "Error adding task");
+    }
   };
 
   return (
@@ -38,6 +65,7 @@ function AddTask() {
           className="w-full p-2 border rounded"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          required
         />
 
         <textarea
@@ -45,6 +73,7 @@ function AddTask() {
           className="w-full p-2 border rounded"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
+          required
         />
 
         <input
@@ -52,9 +81,21 @@ function AddTask() {
           className="w-full p-2 border rounded"
           value={dueDate}
           onChange={(e) => setDueDate(e.target.value)}
+          required
         />
 
-        {/* 🔥 NEW FIELD */}
+        {/* 🔥 PRIORITY */}
+        <select
+          className="w-full p-2 border rounded"
+          value={priority}
+          onChange={(e) => setPriority(e.target.value)}
+        >
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+
+        {/* 🔥 DIFFICULTY */}
         <select
           className="w-full p-2 border rounded"
           value={difficulty}
